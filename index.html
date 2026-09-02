@@ -4,95 +4,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trabalho de Extensão</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-
-    <link rel="stylesheet" href="SRC/cSS/stylesheet.css">
-
-    
-
-
+    <title>Reserva de Salas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/src/css/style.css">
 </head>
 
 <body>
 
+    <nav class="navbar navbar-expand-lg navbar-custom border-bottom">
+            <div class="container">
+            <a class="navbar-brand fw-bold neon" href="#">Sistema de Agendamento de Salas</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarPrincipal">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-
-    <div class="app-shell">
-        <aside class="sidebar p-3 ">
-            <a class="brand d-flex align-center gap-2 mb-4" href="#">
-                <span class="brand-mark">s2</span>
-                <span>Maos que ajudam</span>
-            </a>
-
-          <p class="menu-label">Menu Pricipal</p>
-          <nav class="nav flex-column" 
-
-        </aside>
-        <main class="main content" id="inicio">
-            <section class="content-area">
-                <div class="row g-4">
-                    <div class="col-xl-8" id="doacoes">
-                        <section class="panel h-100">
-                            <div class="panel-heading d-flex justify-content-between align-items-center gap-2">
-                                <div>
-                                    <h2>Doações recentes</h2>
-                                    <p>Acompanhe as últimas contribuições recebidas.</p>
-                                </div><a href="#doacoes">Ver todas →</a>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table align-middle mb-0">
-                                    <thead>
-                                        <tr>
-                                            <th>Doador</th>
-                                            <th>Item</th>
-                                            <th>Data</th>
-                                            <th>Status</th>
-                                            <th>Valor</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="donations-table"></tbody>
-                                </table>
-                            </div>
-                        </section>
-                    </div>
-                    <!--<div class="col-xl-4" id="necessidades">
-                        <section class="panel h-100">
-                            <div class="panel-heading">
-                                <h2>Necessidades da ONG</h2>
-                                <p>Itens que precisam de atenção.</p>
-                            </div>
-                            <div class="needs-list">
-                                <div class="need-item"><span class="need-dot urgent"></span>
-                                    <div><strong>Cestas básicas</strong><small>Faltam 24 unidades</small></div><span
-                                        class="badge-soft red">Urgente</span>
-                                </div>
-                                <div class="need-item"><span class="need-dot"></span>
-                                    <div><strong>Material escolar</strong><small>Faltam 60 kits</small></div><span
-                                        class="badge-soft yellow">Atenção</span>
-                                </div>
-                                <div class="need-item"><span class="need-dot"></span>
-                                    <div><strong>Roupas infantis</strong><small>Faltam 35 peças</small></div><span
-                                        class="badge-soft green">Normal</span>
-                                </div>
-                            </div><button class="btn btn-outline-primary w-100 mt-3">Gerenciar necessidades</button>
-                        </section>
-                    </div>
-                    <!-->
+            <div class="navbar bg-body-tertiary">
+                <div class="container-fluid">
+                  <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Search"/>
+                    <button class="btn btn-outline-success" type="submit">Buscar</button>
+                  </form>
                 </div>
-            </section>
-        </main>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+
+        <div class="mb-4">
+            <p class="text-secondary mb-1">Painel de Agendamentos</p>
+            <h1 class="h3">Salas e Laboratórios</h1>
+            <p class="text-secondary">Gerencie as reservas de salas de aula e laboratórios</p>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-secondary mb-1">Total de Reservas</p>
+                        <h2 id="totalReservas">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-secondary mb-1">Reservas de Manhã</p>
+                        <h2 id="totalManha">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="text-secondary mb-1">Reservas da Noite</p>
+                        <h2 id="totalNoite">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4" id="buscar">
+            <div class="card-body">
+                <h2 class="h5">Buscar Reservas</h2>
+                <p class="text-secondary">Pesquise e filtre os agendamentos cadastrados</p>
+
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Solicitante</label>
+                        <input type="text" class="form-control" id="filtroNome" placeholder="Nome do solicitante">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Data</label>
+                        <input type="date" class="form-control" id="filtroData">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Bloco</label>
+                        <select class="form-select" id="filtroBloco">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Sala</label>
+                        <select class="form-select" id="filtroSala">
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h2 class="h5 mb-1">Reservas</h2>
+                        <p class="text-secondary mb-0">Agendamentos atuais</p>
+                    </div>
+                </div>
+
+                <div id="alertaVazio" class="alert alert-info d-none">
+                    Ainda não foram realizadas reservas de salas.
+                </div>
+
+                <div id="listaReservas"></div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <div class="modal fade" id="modalReserva" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title">Nova Reserva</h5>
+                        <small class="text-secondary">Preencha os dados do agendamento</small>
+                    </div>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div id="alertaErro" class="alert alert-danger d-none"></div>
+
+                    <form id="formReserva">
+
+                        <div class="mb-3">
+                            <label class="form-label">Nome do Solicitante</label>
+                            <input type="text" class="form-control" id="solicitante" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Bloco</label>
+                                <select class="form-select" id="bloco" required>
+                                    <option value="">Selecione</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Sala</label>
+                                <select class="form-select" id="sala" required>
+                                    <option value="">Selecione o bloco</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Data da Reserva</label>
+                            <input type="date" class="form-control" id="data" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Turno</label>
+                            <select class="form-select" id="turno" required>
+                                <option value="">Selecione</option>
+                                <option value="Manhã">Manhã</option>
+                                <option value="Tarde">Tarde</option>
+                                <option value="Noite">Noite</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-secondary w-50" data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+
+                            <button type="submit" class="btn btn-dark w-50">
+                                Reservar
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
     </div>
 
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
-
-       <script src="src/app.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="src/app.js"></script>
 
 </body>
 
