@@ -4,28 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reserva de Salas</title>
+    <title>Sistema de Agendamento de Salas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/src/css/style.css">
+    <link rel="stylesheet" href="src/css/style.css">
 </head>
 
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-custom border-bottom">
+    <nav class="navbar navbar-expand-lg border-bottom" data-bs-theme="dark">
             <div class="container">
             <a class="navbar-brand fw-bold neon" href="#">Sistema de Agendamento de Salas</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarPrincipal">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navConteudo">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="navbar bg-body-tertiary">
-                <div class="container-fluid">
-                  <form class="d-flex" role="search">
+            
+                <div class="collapse navbar-collapse" id="navConteudo">
+                    <button class="btn btn-outline-success btn-agendar" type="button"
+                     data-bs-toggle="modal" data-bs-target="#modalReserva">
+                        Novo Agendamento
+                     </button>
+                     <form class="d-flex ms-auto" role="search">
                     <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Search"/>
-                    <button class="btn btn-outline-success" type="submit">Buscar</button>
+                    <button class="btn btn-outline-success" type="button">Buscar</button>
                   </form>
                 </div>
-            </div>
+            
         </div>
     </nav>
 
@@ -50,7 +54,7 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
-                        <p class="text-secondary mb-1">Reservas de Manhã</p>
+                        <p class="text-secondary mb-1">Reservas do Dia</p>
                         <h2 id="totalManha">0</h2>
                     </div>
                 </div>

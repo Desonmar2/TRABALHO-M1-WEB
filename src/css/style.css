@@ -17,6 +17,13 @@ body {
     color: #ffffff;
 }
 
+.btn-agendar{
+   border-radius: 7px;
+   padding: 10px 20px;
+   font-weight: 600;
+
+}
+
 main {
     max-width: 1100px;
 }
