@@ -1,7 +1,4 @@
 
-// "é um módulo só de dados, simula o array estático que uma API REST devolveria;
-//  não importa nada, só exporta duas constantes."
-
 export const infraestrutura = [
     { bloco: "Bloco A", salas: ["Sala 101", "Sala 102", "Laboratório de Informática 1"] },
     { bloco: "Bloco B", salas: ["Sala 201", "Sala 202", "Laboratório de Redes"] },

@@ -24,8 +24,9 @@
                      data-bs-toggle="modal" data-bs-target="#modalReserva">
                         Novo Agendamento
                      </button>
-                     <form class="d-flex ms-auto" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Search"/>
+                     <form class="d-flex ms-auto" role="search" id="formBuscaTopo">
+                    <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Search"/
+                     id="buscaTopo"/>
                     <button class="btn btn-outline-success" type="button">Buscar</button>
                   </form>
                 </div>
@@ -45,7 +46,7 @@
             <div class="col-md-3">
                 <div class="card">
                     <div class="card-body">
-                        <p class="text-secondary mb-1">Total de Reservas</p>
+                        <p class="text-secondary mb-1">Total de Reservas </p>
                         <h2 id="totalReservas">0</h2>
                     </div>
                 </div>
@@ -54,7 +55,7 @@
             <div class="col-md-3">
                 <div class="card">
                     <div class="card-body">
-                        <p class="text-secondary mb-1">Reservas da Manhã</p>
+                        <p class="text-secondary mb-1">Manhã</p>
                         <h2 id="totalManha">0</h2>
                     </div>
                 </div>
@@ -63,7 +64,7 @@
             <div class="col-md-3">
                 <div class="card">
                     <div class="card-body">
-                        <p class="text-secondary mb-1">Reservas da Tarde</p>
+                        <p class="text-secondary mb-1">Tarde</p>
                         <h2 id="totalTarde">0</h2>
                     </div>
                 </div>
@@ -72,7 +73,7 @@
             <div class="col-md-3">
                 <div class="card">
                     <div class="card-body">
-                        <p class="text-secondary mb-1">Reservas da Noite</p>
+                        <p class="text-secondary mb-1">Noite</p>
                         <h2 id="totalNoite">0</h2>
                     </div>
                 </div>
@@ -125,7 +126,9 @@
                 <div id="alertaVazio" class="alert alert-info d-none">
                     Ainda não foram realizadas reservas de salas.
                 </div>
-
+                 
+                
+                <!-- linha 4 ui.js, quando rodar o UI.JS renderiza a lista e injeta na na div #listaReservas da linha 131 -->
                 <div id="listaReservas"></div>
 
             </div>
