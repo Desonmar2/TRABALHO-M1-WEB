@@ -112,7 +112,12 @@ h2 {
 }
 
 @media (max-width: 900px) {
-       .navbar form {
+    main {
+        padding-left: 400px;
+        padding-right: 400px;
+    }
+
+    .navbar form {
         margin-top: 15px;
         width: 100%;
     }

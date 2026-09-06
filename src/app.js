@@ -1,148 +1,246 @@
-// ===== app.js =====
-// PONTO DE ENTRADA. E o unico arquivo que o HTML chama:
-//   <script type="module" src="src/app.js">
-// O browser baixa dados.js, logica.js e ui.js sozinho, seguindo estes import.
-// O que o app.js faz:
-//   1. guarda o estado (o array 'estado' = unica fonte da verdade)
-//   2. registra os eventos (filtros, cascata, submit, excluir)
-//   3. orquestra: todo evento termina chamando atualizarTela()
+import { blocos, salas, reservas } from "./dados.js";
 
-import { infraestrutura , agendamentosIniciais,  } from './dados.js';
-import { calcularMetricas, aplicarFiltros, listarBlocos, salasDoBloco, existeColisao, proximoId } from './logica.js';
-import { alternarAlertaVazio, renderizarLista, renderizarMetricas, lerFiltros, popularSelect,
-         mostrarErroModal, limparErroModal, resetarFormulario, fecharModal} from './ui.js';
+const bloco = document.getElementById("bloco");
+const sala = document.getElementById("sala");
 
-// [...agendamentosIniciais] = copia do array de dados.js (nao mexo no original).
-// 'let' porque o excluir reatribui: estado = estado.filter(...).
-let estado = [... agendamentosIniciais];
-
-
-// atualizarTela() = funcao central. A tela e sempre um reflexo do estado.
-// le os filtros -> aplica no estado -> desenha lista + metricas + alerta vazio
-// SEMPRE a partir da listaVisivel (lista ja filtrada), nunca do estado direto.
-function atualizarTela() {
-
-    const filtros = lerFiltros();
-    const listaVisivel = aplicarFiltros(estado, filtros);
-
-    renderizarLista(listaVisivel);
-    renderizarMetricas(calcularMetricas(listaVisivel));
-    alternarAlertaVazio(listaVisivel.length === 0);
-}
-
-
-// --- carga inicial dos <select> ---
-// listarBlocos devolve ["Bloco A","Bloco B","Bloco C"]; os selects de sala
-// comecam vazios (so a opcao neutra) e sao preenchidos pela cascata.
-const nomesDosBlocos = listarBlocos(infraestrutura);
-
-popularSelect("filtroBloco", nomesDosBlocos, "Todos");
-popularSelect("filtroSala", [], "Todas");
-popularSelect("bloco", nomesDosBlocos, "Selecione");
-popularSelect("sala", [], "Selecione o bloco");
-
-
-// --- eventos dos filtros ---
-// input = dispara a cada tecla (busca em tempo real no campo de texto)
-// change = dispara quando muda a opcao do <select>
-// passo 'atualizarTela' sem () = "chame essa funcao quando o evento acontecer"
-document.getElementById("filtroNome").addEventListener("input", atualizarTela);
-document.getElementById("filtroData").addEventListener("input", atualizarTela);
-document.getElementById("filtroSala").addEventListener("change", atualizarTela);
-
-// cascata: trocar o bloco recarrega as salas daquele bloco e re-filtra
-document.getElementById("filtroBloco").addEventListener("change", () => {
-    const blocoEscolhido = document.getElementById("filtroBloco").value;
-    const salas = salasDoBloco(infraestrutura, blocoEscolhido);
-    popularSelect("filtroSala", salas, "Todas");
-    atualizarTela();
+// Preenche o <select> de blocos com as opções que vêm do arquivo de dados
+blocos.forEach(function (item) {
+    bloco.innerHTML += `
+        <option value="${item}">Bloco ${item}</option>
+    `;
 });
 
-// cascata do formulario da modal: mesma ideia, so recarrega o select de sala
-document.getElementById("bloco").addEventListener("change", () => {
-    const blocoEscolhido = document.getElementById("bloco").value;
-    const salas = salasDoBloco(infraestrutura, blocoEscolhido);
-    popularSelect("sala", salas, "Selecione");
+// Quando o usuário escolhe um bloco, monta a lista de salas daquele bloco
+bloco.addEventListener("change", function () {
+    sala.innerHTML = `<option value="">Selecione a sala</option>`;
+
+    if (bloco.value != "") {
+        salas[bloco.value].forEach(function (numero) {
+            sala.innerHTML += `
+                <option value="${numero}">Sala ${numero}</option>
+            `;
+        });
+    }
 });
 
+const formReserva = document.getElementById("formReserva");
+const solicitante = document.getElementById("solicitante");
+const dataReserva = document.getElementById("data");
+const turno = document.getElementById("turno");
+const listaReservas = document.getElementById("listaReservas");
+const alertaVazio = document.getElementById("alertaVazio");
+const alertaErro = document.getElementById("alertaErro");
+const pesquisa = document.querySelector("nav form input");
+const botaoBuscar = document.querySelector("nav form button");
+const filtroNome = document.getElementById("filtroNome");
+const filtroSala = document.getElementById("filtroSala");
+const filtroData = document.getElementById("filtroData");
+const filtroBloco = document.getElementById("filtroBloco");
 
-// --- submit do formulario de nova reserva ---
-// evento.preventDefault() = impede o comportamento padrao do form (recarregar
-// a pagina). Sem isso nada funciona.
-document.getElementById("formReserva").addEventListener("submit", (evento) => {
-    evento.preventDefault();
 
+
+// Cuida do envio do formulário de nova reserva
+formReserva.addEventListener("submit", function (event) {
+    event.preventDefault(); // evita que a página recarregue
+
+    // Junta tudo que o usuário preencheu num único objeto
     const novaReserva = {
-        solicitante: document.getElementById("solicitante").value,
-        bloco: document.getElementById("bloco").value,
-        sala: document.getElementById("sala").value,
-        data: document.getElementById("data").value,
-        turno: document.getElementById("turno").value,
+        solicitante: solicitante.value,
+        bloco: bloco.value,
+        sala: sala.value,
+        data: dataReserva.value,
+        turno: turno.value
     };
 
-    // COM colisao: mostra o alerta vermelho dentro da modal e para (return).
-    // A modal NAO fecha (requisito 3.3 do enunciado).
-    if (existeColisao(estado, novaReserva)) {
-        const mensagem = `Conflito de Agendamento: A ${novaReserva.sala} do ${novaReserva.bloco} já está ocupada no turno da ${novaReserva.turno} na data selecionada.`;
-        mostrarErroModal(mensagem);
-        return;
-    }
+    // Verifica se já existe uma reserva pro mesmo bloco, sala, data e turno
+    const salaOcupada = reservas.some(function (reserva) {
 
-    // SEM colisao: da o id, adiciona no estado, limpa erro, fecha modal via JS,
-    // reseta o formulario e redesenha a tela.
-    novaReserva.id = proximoId(estado);
-    estado.push(novaReserva);
-
-    limparErroModal();
-    fecharModal();
-    resetarFormulario();
-    atualizarTela();
-});
+         return reserva.bloco == novaReserva.bloco &&
+         reserva.sala == novaReserva.sala &&
+         reserva.data == novaReserva.data &&
+         reserva.turno == novaReserva.turno
 
 
-// --- excluir reserva (DELEGACAO DE EVENTOS) ---
-// Escuto o clique no container #listaReservas (fixo no HTML), nao em cada botao.
-// Motivo: os botoes sao recriados toda vez que renderizarLista roda (innerHTML
-// e reescrito); um listener preso no botao sumiria junto.
-// evento.target = o elemento clicado. Se nao for um .btn-excluir, ignoro.
-// dataset.id = o data-id do botao (vem como texto -> Number() converte).
-// filter cria um array novo SEM a reserva daquele id (mantem os id diferentes).
-document.getElementById("listaReservas").addEventListener("click", (evento) => {
-    const elementoClicado = evento.target;
 
-    if (elementoClicado.classList.contains("btn-excluir") === false) {
-        return;
-    }
-
-    const idTexto = elementoClicado.dataset.id;
-    const id = Number(idTexto);
-
-    estado = estado.filter(reserva => {
-        return reserva.id !== id;
     });
 
-    atualizarTela();
+    // Se a sala já estiver ocupada, mostra o erro e para por aqui
+    if (salaOcupada) {
+        alertaErro.textContent = "esta sala já está reservada para esse dia e turno.";
+        alertaErro.classList.remove("d-none");
+
+        return;
+    }
+
+    // Deu tudo certo: guarda a reserva, salva e atualiza a tela
+    reservas.push(novaReserva);
+    salvarReservas();
+    alertaErro.classList.add("d-none");
+
+    mostrarReservas();
+    atualizarEstatisticas();
+
+    // Limpa o formulário e fecha o modal
+    formReserva.reset();
+    sala.innerHTML = `
+        <option value="">Selecione o bloco</option>
+    `;
+    const modal = bootstrap.Modal.getInstance(
+        document.getElementById("modalReserva")
+    );
+    modal.hide();
+
+});
+
+// Salva a lista de reservas no localStorage pra não perder ao fechar a página
+function salvarReservas() {
+    localStorage.setItem("reservas", JSON.stringify(reservas));
+}
+
+// Desenha na tela a lista de reservas (por padrão mostra todas)
+function mostrarReservas(lista = reservas) {
+    listaReservas.innerHTML = "";
+
+    // Se não tiver nada pra mostrar, exibe o aviso de "vazio" e para
+    if (lista.length == 0) {
+        alertaVazio.classList.remove("d-none");
+        return;
+
+    }
+
+alertaVazio.classList.add("d-none");
+
+// Cria um cartão para cada reserva
+lista.forEach(function (reserva) {
+// Vira a data de 2026-09-06 para 06/09/2026
+const dataFormatada = reserva.data.split("-").reverse().join("/");
+
+listaReservas.innerHTML += `
+        <div class="border rounded p-3 mb-2">
+            <h5>${reserva.solicitante}</h5>
+            <p class="mb-1">
+                Bloco ${reserva.bloco} - Sala ${reserva.sala}
+            </p>
+            <p class="mb-0">
+                ${dataFormatada} - ${reserva.turno}
+            </p>
+        </div>
+     `;
+});
+}
+
+// Atualiza os contadores do topo: total geral e total por turno
+function atualizarEstatisticas() {
+    document.getElementById("totalReservas").textContent =
+        reservas.length;
+
+    document.getElementById("totalManha").textContent =
+        reservas.filter(function (reserva) {
+            return reserva.turno == "Manhã";
+        }).length;
+
+    document.getElementById("totalTarde").textContent =
+        reservas.filter(function (reserva) {
+            return reserva.turno == "Tarde";
+        }).length;
+
+    document.getElementById("totalNoite").textContent =
+        reservas.filter(function (reserva) {
+            return reserva.turno == "Noite";
+        }).length;
+
+}
+
+// Busca da barra de navegação: filtra reservas por qualquer campo
+botaoBuscar.addEventListener("click", function() {
+    const texto = pesquisa.value.trim().toLowerCase();
+
+    // Campo vazio: mostra todas as reservas
+    if (texto == "") {
+        mostrarReservas(reservas);
+        return;
+    }
+
+    // Mantém só as reservas em que o texto digitado aparece em algum campo
+    const resultado = reservas.filter(function(reserva) {
+
+        return reserva.solicitante.toLowerCase().includes(texto) ||
+               reserva.bloco.toLowerCase().includes(texto) ||
+               reserva.sala.toString().includes(texto) ||
+               reserva.data.includes(texto) ||
+               reserva.turno.toLowerCase().includes(texto);
+
+    });
+
+    mostrarReservas(resultado);
+
 });
 
 
-// --- campo de busca da navbar (topo) ---
-// Nao tem logica propria: so copia o texto pro #filtroNome e manda re-renderizar.
-// input = filtra a cada tecla. submit = quando aperta Enter / clica Buscar
-// (o preventDefault evita recarregar a pagina).
-document.getElementById("buscaTopo").addEventListener("input", (evento) => {
-    document.getElementById("filtroNome").value = evento.target.value;
-    atualizarTela();
-});
+// Se o usuário apagar tudo do campo de busca, volta a mostrar todas
+pesquisa.addEventListener("input", function() {
 
-document.getElementById("formBuscaTopo").addEventListener("submit", (evento) => {
-    evento.preventDefault();
-    document.getElementById("filtroNome").value = document.getElementById("buscaTopo").value;
-    atualizarTela();
+    if (pesquisa.value == "") {
+        mostrarReservas(reservas);
+    }
+
 });
 
 
-// primeira pintura da tela ao carregar a pagina
-atualizarTela();
+
+// Preenche o <select> de bloco da área de filtros
+blocos.forEach(function (item) {
+    filtroBloco.innerHTML += `<option value="${item}">Bloco ${item}</option>`;
+});
 
 
+// Ao trocar o bloco no filtro, atualiza as salas disponíveis e refiltra
+filtroBloco.addEventListener("change", function () {
+    filtroSala.innerHTML = `<option value="">Todas</option>`;
 
+    if (filtroBloco.value != "") {
+        salas[filtroBloco.value].forEach(function (numero) {
+            filtroSala.innerHTML += `<option value="${numero}">Sala ${numero}</option>`;
+        });
+    }
+
+    filtrarReservas();
+});
+
+// Aplica os filtros de nome, data, bloco e sala ao mesmo tempo
+function filtrarReservas() {
+    const nome = filtroNome.value.trim().toLowerCase();
+    const data = filtroData.value;
+    const blocoEscolhido = filtroBloco.value;
+    const salaEscolhida = filtroSala.value;
+
+    const resultado = reservas.filter(function (reserva) {
+        // Cada "bate..." é true quando o filtro está vazio ou quando casa com a reserva
+        const bateNome =
+            nome === "" || reserva.solicitante.toLowerCase().includes(nome);
+
+        const bateData =
+            data === "" || reserva.data === data;
+
+        const bateBloco =
+            blocoEscolhido === "" || reserva.bloco === blocoEscolhido;
+
+        const bateSala =
+            salaEscolhida === "" || reserva.sala === salaEscolhida;
+
+        // Só passa quem atende a todos os filtros
+        return bateNome && bateData && bateBloco && bateSala;
+    });
+
+    mostrarReservas(resultado);
+}
+
+// Refaz o filtro sempre que um dos campos muda
+filtroNome.addEventListener("input", filtrarReservas);
+filtroData.addEventListener("input", filtrarReservas);
+filtroSala.addEventListener("change", filtrarReservas);
+
+
+// Ao abrir a página, já mostra as reservas e os números do topo
+mostrarReservas();
+atualizarEstatisticas();
