@@ -12,35 +12,26 @@
 <body>
 
     <nav class="navbar navbar-expand-lg border-bottom" data-bs-theme="dark">
-            <div class="container">
+        <div class="container">
             <a class="navbar-brand fw-bold neon" href="#">Sistema de Agendamento de Salas</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navConteudo">
                 <span class="navbar-toggler-icon"></span>
             </button>
-
-            
-                <div class="collapse navbar-collapse" id="navConteudo">
-                    <button class="btn btn-outline-success btn-agendar" type="button"
-                     data-bs-toggle="modal" data-bs-target="#modalReserva">
-                        Novo Agendamento
-                     </button>
-                     <form class="d-flex ms-auto" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Pesquisar" aria-label="Search"/>
-                    <button class="btn btn-outline-success" type="button">Buscar</button>
-                  </form>
-                </div>
-            
+            <div class="collapse navbar-collapse" id="navConteudo">
+                <button class="btn btn-outline-success btn-agendar" type="button"
+                    data-bs-toggle="modal" data-bs-target="#modalReserva">
+                    Novo Agendamento
+                </button>
+            </div>
         </div>
     </nav>
 
     <main class="container py-4">
-
         <div class="mb-4">
             <p class="text-secondary mb-1">Painel de Agendamentos</p>
             <h1 class="h3">Salas e Laboratórios</h1>
             <p class="text-secondary">Gerencie as reservas de salas de aula e laboratórios</p>
         </div>
-
         <div class="row g-3 mb-4">
             <div class="col-md-3">
                 <div class="card">
@@ -50,7 +41,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-3">
                 <div class="card">
                     <div class="card-body">
@@ -59,7 +49,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-3">
                 <div class="card">
                     <div class="card-body">
@@ -68,7 +57,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-3">
                 <div class="card">
                     <div class="card-body">
@@ -78,30 +66,25 @@
                 </div>
             </div>
         </div>
-
         <div class="card mb-4" id="buscar">
             <div class="card-body">
                 <h2 class="h5">Buscar Reservas</h2>
                 <p class="text-secondary">Pesquise e filtre os agendamentos cadastrados</p>
-
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label class="form-label">Solicitante</label>
                         <input type="text" class="form-control" id="filtroNome" placeholder="Nome do solicitante">
                     </div>
-
                     <div class="col-md-3">
                         <label class="form-label">Data</label>
                         <input type="date" class="form-control" id="filtroData">
                     </div>
-
                     <div class="col-md-3">
                         <label class="form-label">Bloco</label>
                         <select class="form-select" id="filtroBloco">
                             <option value="">Todos</option>
                         </select>
                     </div>
-
                     <div class="col-md-3">
                         <label class="form-label">Sala</label>
                         <select class="form-select" id="filtroSala">
@@ -111,52 +94,38 @@
                 </div>
             </div>
         </div>
-
         <div class="card">
             <div class="card-body">
-
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div>
                         <h2 class="h5 mb-1">Reservas</h2>
                         <p class="text-secondary mb-0">Agendamentos atuais</p>
                     </div>
                 </div>
-
                 <div id="alertaVazio" class="alert alert-info d-none">
                     Ainda não foram realizadas reservas de salas.
                 </div>
-
                 <div id="listaReservas"></div>
-
             </div>
         </div>
-
     </main>
-
     <div class="modal fade" id="modalReserva" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-
                 <div class="modal-header">
                     <div>
                         <h5 class="modal-title">Nova Reserva</h5>
                         <small class="text-secondary">Preencha os dados do agendamento</small>
                     </div>
-
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body">
-
                     <div id="alertaErro" class="alert alert-danger d-none"></div>
-
                     <form id="formReserva">
-
                         <div class="mb-3">
                             <label class="form-label">Nome do Solicitante</label>
                             <input type="text" class="form-control" id="solicitante" required>
                         </div>
-
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Bloco</label>
@@ -164,7 +133,6 @@
                                     <option value="">Selecione</option>
                                 </select>
                             </div>
-
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Sala</label>
                                 <select class="form-select" id="sala" required>
@@ -172,12 +140,10 @@
                                 </select>
                             </div>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Data da Reserva</label>
                             <input type="date" class="form-control" id="data" required>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Turno</label>
                             <select class="form-select" id="turno" required>
@@ -187,20 +153,16 @@
                                 <option value="Noite">Noite</option>
                             </select>
                         </div>
-
                         <div class="d-flex gap-2">
                             <button type="button" class="btn btn-outline-secondary w-50" data-bs-dismiss="modal">
                                 Cancelar
                             </button>
-
                             <button type="submit" class="btn btn-dark w-50">
                                 Reservar
                             </button>
                         </div>
-
                     </form>
                 </div>
-
             </div>
         </div>
     </div>
